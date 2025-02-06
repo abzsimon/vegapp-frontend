@@ -46,7 +46,7 @@ const TabNavigator = () => {
     </Tab.Navigator>
   );
 };
-
+// un commentaire je ne sais où
 export default function App() {
   return (
       <NavigationContainer>
