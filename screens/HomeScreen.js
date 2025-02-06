@@ -23,7 +23,7 @@ const [confirmPassword, setConfirmPassword] = useState('');
 
 const handleSubmit = () => {
   setSignInModalVisible(false);
-  navigation.replace('TabNavigator', { screen: 'Places' });
+  navigation.replace('DrawerNavigator');
 };
 const SignInModal = () => (
     <Modal
