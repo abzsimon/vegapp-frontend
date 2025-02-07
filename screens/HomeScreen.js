@@ -142,6 +142,7 @@ function SignUpModal({isOpen, onRequestClose}) {
             placeholder="Nickname"
             value={nickname}
             onChangeText={setNickname}
+            placeholderTextColor="grey"
           />
           <TextInput
             style={styles.input}
@@ -149,6 +150,7 @@ function SignUpModal({isOpen, onRequestClose}) {
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
+            placeholderTextColor="grey"
           />
           <TextInput
             style={styles.input}
@@ -156,6 +158,7 @@ function SignUpModal({isOpen, onRequestClose}) {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            placeholderTextColor="grey"
           />
           <TextInput
             style={styles.input}
@@ -163,6 +166,7 @@ function SignUpModal({isOpen, onRequestClose}) {
             value={confirmPassword}
             onChangeText={setConfirmPassword} 
             secureTextEntry
+            placeholderTextColor="grey"
           />
           <TouchableOpacity
             style={styles.button}
