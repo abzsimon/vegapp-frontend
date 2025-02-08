@@ -54,7 +54,7 @@ const TabNavigator = () => {
 
           return <FontAwesome name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#ec6e5b",
+        tabBarActiveTintColor: "#049DD9",
         tabBarInactiveTintColor: "#335561",
         headerShown: false,
       })}
@@ -77,6 +77,7 @@ export default function App() {
           {/* 🔹 L'utilisateur voit d'abord l'écran de connexion */}
           <Stack.Screen name="Sign-in-up" component={HomeScreen} />
           {/* 🔹 Une fois connecté, il accède au Drawer Navigator */}
+          <Stack.Screen name="Sign-in-up" component={HomeScreen} />
           <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
