@@ -77,7 +77,6 @@ export default function App() {
           {/* 🔹 L'utilisateur voit d'abord l'écran de connexion */}
           <Stack.Screen name="Sign-in-up" component={HomeScreen} />
           {/* 🔹 Une fois connecté, il accède au Drawer Navigator */}
-          <Stack.Screen name="Sign-in-up" component={HomeScreen} />
           <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
