@@ -74,10 +74,10 @@ export default function App() {
     <SafeAreaView style={{ flex: 1 }}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {/* 🔹 Une fois connecté, il accède au Drawer Navigator */}
-          <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
           {/* 🔹 L'utilisateur voit d'abord l'écran de connexion */}
           <Stack.Screen name="Sign-in-up" component={HomeScreen} />
+          {/* 🔹 Une fois connecté, il accède au Drawer Navigator */}
+          <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
