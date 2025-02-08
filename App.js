@@ -1,5 +1,5 @@
 import "react-native-gesture-handler";
-import "react-native-reanimated"; 
+import "react-native-reanimated";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
@@ -7,6 +7,14 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+
+// Redux
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
+import user from "./reducers/user"
+const store = configureStore({
+  reducer: { user },
+});
 
 // Screens
 import HomeScreen from "./screens/HomeScreen";
@@ -17,22 +25,25 @@ import NewsScreen from "./screens/NewsScreen";
 import AddRecipeScreen from "./screens/AddRecipeScreen";
 import ProposedRecipesScreen from "./screens/ProposedRecipesScreen";
 
-// Création des navigateurs
+// création des navigateurs
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
-// ✅ Drawer Navigator : Contient le TabNavigator et d'autres écrans
+// création du drawer navigator
 function DrawerNavigator() {
   return (
     <Drawer.Navigator>
       <Drawer.Screen name="Home" component={TabNavigator} />
-      <Drawer.Screen name="Proposed Recipes" component={ProposedRecipesScreen} />
+      <Drawer.Screen
+        name="Proposed Recipes"
+        component={ProposedRecipesScreen}
+      />
     </Drawer.Navigator>
   );
 }
 
-// ✅ Bottom Tab Navigator (onglets en bas)
+// création de la vue par onglets
 const TabNavigator = () => {
   return (
     <Tab.Navigator
@@ -68,18 +79,21 @@ const TabNavigator = () => {
   );
 };
 
-// ✅ Navigation principale
+// REDUX
+
+// APP
 export default function App() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {/* 🔹 L'utilisateur voit d'abord l'écran de connexion */}
-          <Stack.Screen name="Sign-in-up" component={HomeScreen} />
-          {/* 🔹 Une fois connecté, il accède au Drawer Navigator */}
-          <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaView>
+    <Provider store={store}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {/* Après avoir passé le HomeScreen, on arrive sur le Drawer Navigator, qui contient Tab Navigator \(name=home component=TabNavigator\), qui contient Places, Bookmarks, AddRecipe, News, Search. Pour le moment j'inverse l'un et l'autre pour travailler en attendant que la logique de sign-in/up soit gérée */}
+            <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
+            <Stack.Screen name="Sign-in-up" component={HomeScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaView>
+    </Provider>
   );
 }

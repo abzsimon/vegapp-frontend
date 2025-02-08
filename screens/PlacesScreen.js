@@ -1,10 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useSelector } from "react-redux";
 
-export default function App() {
+import Header from "../components/header"
+
+export default function PlacesScreen() {
+  
  return (
    <View style={styles.container}>
-     <Text>Places screen</Text>
-   </View>  );
+    <Header screenType = "Trouvez un commerce !"/>
+   </View>  
+   );
 }
 
 const styles = StyleSheet.create({
