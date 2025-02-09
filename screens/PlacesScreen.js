@@ -7,7 +7,7 @@ export default function PlacesScreen() {
   
  return (
    <View style={styles.container}>
-    <Header screenType = "Trouvez un commerce !"/>
+    <Header screenType="Trouvez un commerce !"/>
    </View>  
    );
 }

@@ -9,12 +9,20 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 // Redux
+import { persistStore, persistReducer } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+const reducers = combineReducers({ user });
+const persistConfig = { key: "Vegapp", storage: AsyncStorage };
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import user from "./reducers/user"
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import user from "./reducers/user";
 const store = configureStore({
-  reducer: { user },
+  reducer: persistReducer(persistConfig, reducers),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
 });
+const persistor = persistStore(store);
 
 // Screens
 import HomeScreen from "./screens/HomeScreen";
@@ -85,15 +93,20 @@ const TabNavigator = () => {
 export default function App() {
   return (
     <Provider store={store}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {/* Après avoir passé le HomeScreen, on arrive sur le Drawer Navigator, qui contient Tab Navigator \(name=home component=TabNavigator\), qui contient Places, Bookmarks, AddRecipe, News, Search. Pour le moment j'inverse l'un et l'autre pour travailler en attendant que la logique de sign-in/up soit gérée */}
-            <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
-            <Stack.Screen name="Sign-in-up" component={HomeScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaView>
+      <PersistGate persistor={persistor}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              {/* Après avoir passé le HomeScreen, on arrive sur le Drawer Navigator, qui contient Tab Navigator \(name=home component=TabNavigator\), qui contient Places, Bookmarks, AddRecipe, News, Search. Pour le moment j'inverse l'un et l'autre pour travailler en attendant que la logique de sign-in/up soit gérée */}
+              <Stack.Screen
+                name="DrawerNavigator"
+                component={DrawerNavigator}
+              />
+              <Stack.Screen name="Sign-in-up" component={HomeScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
+      </PersistGate>
     </Provider>
   );
 }

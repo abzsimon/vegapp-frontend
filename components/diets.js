@@ -48,13 +48,13 @@ const styles = StyleSheet.create({
     backgroundColor: "green",
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: "row",
     padding: 20,
   },
   btn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    width: 200,
     marginVertical: 10,
   },
 });
