@@ -97,12 +97,13 @@ export default function App() {
         <SafeAreaView style={{ flex: 1 }}>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              {/* Après avoir passé le HomeScreen, on arrive sur le Drawer Navigator, qui contient Tab Navigator \(name=home component=TabNavigator\), qui contient Places, Bookmarks, AddRecipe, News, Search. Pour le moment j'inverse l'un et l'autre pour travailler en attendant que la logique de sign-in/up soit gérée */}
+            <Stack.Screen 
+            name="Sign-in-up" 
+            component={HomeScreen} />
               <Stack.Screen
-                name="DrawerNavigator"
-                component={DrawerNavigator}
+            name="DrawerNavigator"
+            component={DrawerNavigator}
               />
-              <Stack.Screen name="Sign-in-up" component={HomeScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaView>

@@ -13,7 +13,13 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
+
 export default function HomeScreen({ navigation }) {
+    
+  const handleSubmit = () => {
+    setSignInModalVisible(false);
+    navigation.replace("DrawerNavigator");
+  };
   // declaration des usestate
   const [signInModalVisible, setSignInModalVisible] = useState(false);
   const [signUpModalVisible, setSignUpModalVisible] = useState(false);
@@ -22,11 +28,6 @@ export default function HomeScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
-  const handleSubmit = () => {
-    setSignInModalVisible(false);
-    navigation.replace("DrawerNavigator");
-  };
 
   useEffect(() => {
     console.log("Sign In Modal Visible:", signInModalVisible);
@@ -94,6 +95,76 @@ export default function HomeScreen({ navigation }) {
     </Modal>
   );
 
+  function SignUpModal({isOpen, onRequestClose}) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [nickname, setNickname] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+   return (
+     <Modal
+       animationType="slide"
+       transparent={true}
+       visible={isOpen}
+       onRequestClose={() => onRequestClose()}
+     >
+       <KeyboardAvoidingView
+         behavior={Platform.OS === "ios" ? "padding" : "height"}
+         style={styles.modalContainer}
+       >
+         <View style={styles.modalView}>
+           <Text style={styles.modalTitle}>Sign Up</Text>
+           <TextInput
+             style={styles.input}
+             placeholder="Nickname"
+             value={nickname}
+             onChangeText={setNickname}
+             placeholderTextColor="grey"
+           />
+           <TextInput
+             style={styles.input}
+             placeholder="Email"
+             value={email}
+             onChangeText={setEmail}
+             autoCapitalize="none"
+             placeholderTextColor="grey"
+           />
+           <TextInput
+             style={styles.input}
+             placeholder="Password"
+             value={password}
+             onChangeText={setPassword}
+             secureTextEntry
+             placeholderTextColor="grey"
+           />
+           <TextInput
+             style={styles.input}
+             placeholder="Confirm Password"
+             value={confirmPassword}
+             onChangeText={setConfirmPassword} 
+             secureTextEntry
+             placeholderTextColor="grey"
+           />
+           <TouchableOpacity
+             style={styles.button}
+             onPress={() => {
+               handleSubmit()
+               onRequestClose();
+             }}
+           >
+           <Text style={styles.buttonText}>Sign Up</Text>
+           </TouchableOpacity>
+           <TouchableOpacity
+             style={styles.closeButton}
+             onPress={() => {}}
+           >
+             <Text style={styles.closeButtonText}>Close</Text>
+           </TouchableOpacity>
+         </View>
+       </KeyboardAvoidingView>
+     </Modal>
+   );
+ }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
@@ -119,75 +190,6 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-function SignUpModal({isOpen, onRequestClose}) {
-   const [email, setEmail] = useState("");
-   const [password, setPassword] = useState("");
-   const [nickname, setNickname] = useState("");
-   const [confirmPassword, setConfirmPassword] = useState("");
-  return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isOpen}
-      onRequestClose={() => onRequestClose()}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.modalContainer}
-      >
-        <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>Sign Up</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nickname"
-            value={nickname}
-            onChangeText={setNickname}
-            placeholderTextColor="grey"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            placeholderTextColor="grey"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholderTextColor="grey"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword} 
-            secureTextEntry
-            placeholderTextColor="grey"
-          />
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              // Ajout plus tard de la logique de sign up
-              onRequestClose();
-            }}
-          >
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => onRequestClose()}
-          >
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
