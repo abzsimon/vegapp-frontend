@@ -88,7 +88,7 @@ const TabNavigator = () => {
 };
 
 // REDUX
-
+//
 // APP
 export default function App() {
   return (
