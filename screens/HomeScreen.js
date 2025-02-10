@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { setUser } from "../reducers/user";
 import {
   StyleSheet,
   View,
@@ -11,23 +13,122 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 
+const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 export default function HomeScreen({ navigation }) {
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleSubmit = async () => {
+    setEmailError("");
+    setPasswordError("");
+    if ( !password.current || !nickname.current) {
+      Alert.alert("Erreur", "Tous les champs sont obligatoires");
+      return;
+    }
+    console.log('Sending:', {
+      email: email.current,
+      password: password.current,
+      username: nickname.current
+    });
     
-  const handleSubmit = () => {
-    setSignInModalVisible(false);
-    navigation.replace("DrawerNavigator");
+    try {
+      const response = await fetch("http://192.168.1.12:3000/users/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: nickname.current, password: password.current }),
+      });
+
+      const data = await response.json();
+
+      if (data.result) {
+        dispatch(
+          setUser({
+            token: data.token,
+            email: data.current,
+            username: nickname.current,
+            favrecipes: data.favrecipes || [],
+            favshops: data.favshops || [],
+            regime: data.regime || [],
+          })
+        );
+        setSignInModalVisible(false);
+        navigation.replace("DrawerNavigator");
+      } else {
+        // Gérer l'erreur de connexion
+        console.log("Erreur de connexion:", data.error);
+      }
+    } catch (error) {
+      Alert.alert("Erreur", "Une erreur est survenue lors de la connexion");
+    }
+  };
+
+  const handleSignUp = async () => {
+    setEmailError("");
+    setPasswordError("");
+    if (!email.current || !password.current || !nickname.current) {
+      Alert.alert("Erreur", "Tous les champs sont obligatoires");
+      return;
+    }
+    if (!EMAIL_REGEX.test(email.current)) {
+      Alert.alert("Erreur", "Email invalide");
+      setEmailError("Format d'email invalide");
+      return;
+    }
+
+    if (!password.current || password.current.length < 6) {
+      Alert.alert("Erreur", "Le mot de passe doit contenir au moins 6 caractères");
+      setPasswordError("Mot de passe trop court");
+      return;
+    }
+
+    if (!nickname.current) {
+      Alert.alert("Erreur", "Veuillez entrer un nom d'utilisateur");
+      return;
+    }
+    try {
+      const response = await fetch("http://192.168.1.12:3000/users/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.current,
+          password: password.current,
+          username: nickname.current,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.result) {
+        dispatch(
+          setUser({
+            token: data.token,
+            email: email.current,
+            username: nickname.current,
+            favrecipes: [],
+            favshops: [],
+            regime: [],
+          })
+        );
+        setSignUpModalVisible(false);
+        navigation.replace("DrawerNavigator");
+      } else {
+        console.log("Erreur d'inscription:", data.error);
+      }
+    } catch (error) {
+      Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription");
+    }
   };
   // declaration des usestate
   const [signInModalVisible, setSignInModalVisible] = useState(false);
   const [signUpModalVisible, setSignUpModalVisible] = useState(false);
-  //const [email, setEmail] = useState("");
   const email = useRef("");
-  const [password, setPassword] = useState("");
-  const [nickname, setNickname] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const password = useRef("");
+  const dispatch = useDispatch();
+  const nickname = useRef("");
 
   useEffect(() => {
     console.log("Sign In Modal Visible:", signInModalVisible);
@@ -66,18 +167,20 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.modalTitle}>Sign In</Text>
             <TextInput
               style={styles.input}
-              placeholder="Email"
+              placeholder="Username"
+              placeholderTextColor="grey"
               //value={email}
-              defaultValue={email.current}
-              onChangeText={(text) => (email.current = text)}
+              defaultValue={nickname.current}
+              onChangeText={(text) => (nickname.current = text)}
               //onChangeText={setEmail}
               autoCapitalize="none"
             />
             <TextInput
               style={styles.input}
               placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
+              placeholderTextColor="grey"
+              defaultValue={password.current}
+              onChangeText={(text) => (password.current = text)}
               secureTextEntry
             />
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
@@ -95,75 +198,116 @@ export default function HomeScreen({ navigation }) {
     </Modal>
   );
 
-  function SignUpModal({isOpen, onRequestClose}) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [nickname, setNickname] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-   return (
-     <Modal
-       animationType="slide"
-       transparent={true}
-       visible={isOpen}
-       onRequestClose={() => onRequestClose()}
-     >
-       <KeyboardAvoidingView
-         behavior={Platform.OS === "ios" ? "padding" : "height"}
-         style={styles.modalContainer}
-       >
-         <View style={styles.modalView}>
-           <Text style={styles.modalTitle}>Sign Up</Text>
-           <TextInput
-             style={styles.input}
-             placeholder="Nickname"
-             value={nickname}
-             onChangeText={setNickname}
-             placeholderTextColor="grey"
-           />
-           <TextInput
-             style={styles.input}
-             placeholder="Email"
-             value={email}
-             onChangeText={setEmail}
-             autoCapitalize="none"
-             placeholderTextColor="grey"
-           />
-           <TextInput
-             style={styles.input}
-             placeholder="Password"
-             value={password}
-             onChangeText={setPassword}
-             secureTextEntry
-             placeholderTextColor="grey"
-           />
-           <TextInput
-             style={styles.input}
-             placeholder="Confirm Password"
-             value={confirmPassword}
-             onChangeText={setConfirmPassword} 
-             secureTextEntry
-             placeholderTextColor="grey"
-           />
-           <TouchableOpacity
-             style={styles.button}
-             onPress={() => {
-               handleSubmit()
-               onRequestClose();
-             }}
-           >
-           <Text style={styles.buttonText}>Sign Up</Text>
-           </TouchableOpacity>
-           <TouchableOpacity
-             style={styles.closeButton}
-             onPress={() => {}}
-           >
-             <Text style={styles.closeButtonText}>Close</Text>
-           </TouchableOpacity>
-         </View>
-       </KeyboardAvoidingView>
-     </Modal>
-   );
- }
+  function SignUpModal({   
+    isOpen, 
+    onRequestClose, 
+    email, 
+    setEmail, 
+    password, 
+    setPassword, 
+    nickname, 
+    setNickname,
+   }) {
+ 
+    const [localConfirmPassword, setLocalConfirmPassword] = useState("");
+    //gestion de l'affichage de l'erreur dans un etat independant pour avoir en temps réel
+    const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
+    const handlePasswordConfirmation = (text) => {
+      setLocalConfirmPassword(text);
+      if (text !== password.current) {
+        setConfirmPasswordError("Les mots de passe ne correspondent pas");
+      } else {
+        setConfirmPasswordError("");
+      }
+    };
+
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isOpen}
+        onRequestClose={() => onRequestClose()}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.modalContainer}
+        >
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Sign Up</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nickname"
+              defaultValue={nickname.current}
+              onChangeText={(text) => nickname.current = text}
+              placeholderTextColor="grey"
+            />
+            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+            <TextInput
+              style={[styles.input, emailError ? styles.inputError : null]}
+              placeholder="Email"
+              defaultValue={email.current}
+              onChangeText={(text) => {
+                email.current = text;
+                if (EMAIL_REGEX.test(text)) {
+                  setEmailError("");
+                }
+              }}
+              autoCapitalize="none"
+              placeholderTextColor="grey"
+            />
+            <TextInput
+              style={[styles.input, passwordError ? styles.inputError : null]}
+              placeholder="Password"
+              defaultValue={password.current}
+              onChangeText={(text) => {
+                password.current = text;
+                if (text.length >= 6) {
+                  setPasswordError("");
+                }
+                if (localConfirmPassword && text !== localConfirmPassword) {
+                  setConfirmPasswordError("Les mots de passe ne correspondent pas");
+                } else {
+                  setConfirmPasswordError("");
+                }
+              }}
+              secureTextEntry
+              placeholderTextColor="grey"
+            />
+             {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm Password"
+              value={localConfirmPassword}
+              onChangeText={handlePasswordConfirmation}
+              secureTextEntry
+              placeholderTextColor="grey"
+            />
+             {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={async () => {
+                if (password.current === localConfirmPassword) {
+                  await handleSignUp();
+                  onRequestClose();
+                } else {setConfirmPasswordError("Les mots de passe ne correspondent pas");
+                Alert.alert("Erreur", "Les mots de passe ne correspondent pas");
+                }
+              }}
+            >
+              <Text style={styles.buttonText}>Sign Up</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={onRequestClose}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -185,11 +329,19 @@ export default function HomeScreen({ navigation }) {
         </View>
       </View>
       <SignInModal />
-      <SignUpModal isOpen={signUpModalVisible} onRequestClose={() => setSignUpModalVisible(false)}/>
+      <SignUpModal
+        isOpen={signUpModalVisible}
+        onRequestClose={() => setSignUpModalVisible(false)}
+        email={email}
+        setEmail={(text) => (email.current = text)}
+        password={password}
+        setPassword={(text) => (password.current = text)}
+        nickname={nickname}
+        setNickname={(text) => (nickname.current = text)}
+      />
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -269,5 +421,17 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: "#666",
     fontSize: 16,
+  },
+  inputError: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: -5,
+    marginBottom: 5,
+    alignSelf: 'flex-start',
+    paddingLeft: 5,
   },
 });
