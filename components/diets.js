@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-// On importe les outils de Redux pour gérer notre state global
 import { useDispatch, useSelector } from 'react-redux';
 import { addDiet, removeDiet } from '../reducers/user';
 
@@ -35,7 +34,7 @@ export default function Diet({ onRegimeChange }) {
       {/* On map sur notre tableau de régimes pour créer un bouton pour chacun */}
       {REGIMES.map((regime) => (
         <TouchableOpacity
-          key={regime} // Clé unique pour React
+          key={regime}
           style={[
             styles.regimeButton,
             // Si le régime est sélectionné, on ajoute un style spécial
@@ -53,24 +52,24 @@ export default function Diet({ onRegimeChange }) {
 // Nos styles pour le composant
 const styles = StyleSheet.create({
   regimeContainer: {
-    flexDirection: 'row', // Les boutons sont alignés horizontalement
-    flexWrap: 'wrap',    // Ils passent à la ligne si pas assez de place
+    flexDirection: 'row', 
+    flexWrap: 'wrap',    
     marginBottom: 20,
-    gap: 10,             // Espace entre les boutons
+    gap: 10,             
   },
   regimeButton: {
     paddingHorizontal: 15,
     paddingVertical: 8,
-    borderRadius: 20,    // Pour avoir des boutons arrondis
+    borderRadius: 20,    
     borderWidth: 1,
     borderColor: '#F28DEB',
     backgroundColor: '#FFFFFF',
   },
   regimeButtonSelected: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 2,      // Bordure plus épaisse quand sélectionné
+    borderWidth: 2,      
   },
   regimeText: {
-    color: '#F28DEB',    // Couleur du texte en rose
+    color: '#F28DEB',   
   },
 });
