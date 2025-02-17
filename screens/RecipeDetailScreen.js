@@ -69,7 +69,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
       });
       const data = await response.json();
       if (data.result) {
-        // Mettre à jour les détails de la recette
+        // Mettre à jour les détails de la recette suite au vote
         fetchRecipeDetails();
       }
     } catch (err) {
