@@ -104,7 +104,9 @@ const TabNavigator = () => {
 };
 
 // REDUX
-//
+// persistor.purge().then()
+// AsyncStorage.clear().then()
+
 // APP
 export default function App() {
   return (
