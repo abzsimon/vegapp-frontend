@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
+import Search from "../components/search";
 
 export default function App() {
  return (
    <View style={styles.container}>
-     <Text>Search screen</Text>
+     <Search></Search>
    </View>  );
 }
 

@@ -1,58 +1,76 @@
-import { SafeAreaView, StyleSheet, Switch, Text } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { addDiet, removeDiet } from "../reducers/user";
-import { useEffect } from "react";
+import React from 'react';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+// On importe les outils de Redux pour gérer notre state global
+import { useDispatch, useSelector } from 'react-redux';
+import { addDiet, removeDiet } from '../reducers/user';
 
-function Diets() {
+// On définit nos régimes alimentaires dans une constante pour pouvoir les réutiliser facilement
+const REGIMES = ['Végé', 'Bio', 'Sans gluten', 'Vegan'];
+
+// Notre composant principal qui reçoit une prop pour notifier les changements
+export default function Diet({ onRegimeChange }) {
+  // On initialise dispatch pour pouvoir envoyer des actions à Redux
   const dispatch = useDispatch();
-  // pour récupérer les régimes stockées dans le reducer
-  const diets = useSelector((state) => state.user.regime);
-  // pour débugger et vérifier si le reducer se met bien à jour 
-  useEffect(() => {
-    console.log(diets)
-  })
+  // On récupère les régimes de l'utilisateur depuis le state Redux
+  const userDiets = useSelector((state) => state.user.regime);
 
-  // une fonction fléchée générique qui prend le type de régime comme paramètre (vegan, vegie, bio ou gluten) et qui l'envoie au reducer en ayant récupéré le contenu de user.regime, pour soit l'ajouter soit le supprimer
-  const toggleDiet = (diet) => {
-    if (diets.includes(diet)) {
-      dispatch(removeDiet(diet)); // supprime si ∃
+  // Fonction qui gère le clic sur un régime alimentaire
+  const toggleDiet = (regime) => {
+    // Si le régime est déjà sélectionné, on le retire
+    if (userDiets.includes(regime)) {
+      dispatch(removeDiet(regime));
     } else {
-      dispatch(addDiet(diet)); // ajoute si ∄
+      // Sinon, on l'ajoute
+      dispatch(addDiet(regime));
+    }
+    // On notifie le composant parent qu'il y a eu un changement (pour la recherche)
+    if (onRegimeChange) {
+      onRegimeChange(regime);
     }
   };
 
+  // La partie visuelle de notre composant
   return (
-    <SafeAreaView style={styles.container}>
-        {/* on vient mapper sur un tableau de quatre strings contenant les types de régime pour générer quatre couples switch/texte qui active/desactive le régime dans le reducer en utilisant la fonction toggleDiet*/}
-      {["vegan", "veggie", "bio", "gluten"].map((diet) => (
-        <SafeAreaView key={diet} style={styles.btn}>
-          <Text>{diet.charAt(0).toUpperCase() + diet.slice(1)}</Text>
-          <Switch
-            style={styles.toggle}
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={diets.includes(diet) ? "#f5dd4b" : "#f4f3f4"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={() => toggleDiet(diet)} // on toggle la valeur (on/off) dans le reducer pour tel régime
-            value={diets.includes(diet)} // on récupère la valeur (booléenne) depuis redux, on/off pour tel régime
-          />
-        </SafeAreaView>
+    <View style={styles.regimeContainer}>
+      {/* On map sur notre tableau de régimes pour créer un bouton pour chacun */}
+      {REGIMES.map((regime) => (
+        <TouchableOpacity
+          key={regime} // Clé unique pour React
+          style={[
+            styles.regimeButton,
+            // Si le régime est sélectionné, on ajoute un style spécial
+            userDiets.includes(regime) && styles.regimeButtonSelected,
+          ]}
+          onPress={() => toggleDiet(regime)}
+        >
+          <Text style={styles.regimeText}>{regime}</Text>
+        </TouchableOpacity>
       ))}
-    </SafeAreaView>
+    </View>
   );
 }
 
-export default Diets;
-
+// Nos styles pour le composant
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "green",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
+  regimeContainer: {
+    flexDirection: 'row', // Les boutons sont alignés horizontalement
+    flexWrap: 'wrap',    // Ils passent à la ligne si pas assez de place
+    marginBottom: 20,
+    gap: 10,             // Espace entre les boutons
   },
-  btn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  regimeButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,    // Pour avoir des boutons arrondis
+    borderWidth: 1,
+    borderColor: '#F28DEB',
+    backgroundColor: '#FFFFFF',
+  },
+  regimeButtonSelected: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,      // Bordure plus épaisse quand sélectionné
+  },
+  regimeText: {
+    color: '#F28DEB',    // Couleur du texte en rose
   },
 });

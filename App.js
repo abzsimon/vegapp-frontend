@@ -32,6 +32,7 @@ import SearchScreen from "./screens/SearchScreen";
 import NewsScreen from "./screens/NewsScreen";
 import AddRecipeScreen from "./screens/AddRecipeScreen";
 import ProposedRecipesScreen from "./screens/ProposedRecipesScreen";
+import RecipeDetailScreen from "./screens/RecipeDetailScreen";
 
 // création des navigateurs
 const Stack = createNativeStackNavigator();
@@ -54,36 +55,51 @@ function DrawerNavigator() {
 // création de la vue par onglets
 const TabNavigator = () => {
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          let iconName = "";
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="TabScreens">
+        {() => (
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ color, size }) => {
+                let iconName = "";
 
-          if (route.name === "Places") {
-            iconName = "map-marker";
-          } else if (route.name === "Bookmarks") {
-            iconName = "bookmark";
-          } else if (route.name === "AddRecipe") {
-            iconName = "plus-circle";
-          } else if (route.name === "News") {
-            iconName = "newspaper-o";
-          } else if (route.name === "Search") {
-            iconName = "search";
-          }
+                if (route.name === "Places") {
+                  iconName = "map-marker";
+                } else if (route.name === "Bookmarks") {
+                  iconName = "bookmark";
+                } else if (route.name === "AddRecipe") {
+                  iconName = "plus-circle";
+                } else if (route.name === "News") {
+                  iconName = "newspaper-o";
+                } else if (route.name === "Search") {
+                  iconName = "search";
+                }
 
-          return <FontAwesome name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: "#049DD9",
-        tabBarInactiveTintColor: "#335561",
-        headerShown: false,
-      })}
-    >
-      <Tab.Screen name="Places" component={PlacesScreen} />
-      <Tab.Screen name="Bookmarks" component={BookmarksScreen} />
-      <Tab.Screen name="AddRecipe" component={AddRecipeScreen} />
-      <Tab.Screen name="News" component={NewsScreen} />
-      <Tab.Screen name="Search" component={SearchScreen} />
-    </Tab.Navigator>
+                return <FontAwesome name={iconName} size={size} color={color} />;
+              },
+              tabBarActiveTintColor: "#049DD9",
+              tabBarInactiveTintColor: "#335561",
+              headerShown: false,
+            })}
+          >
+            <Tab.Screen name="Places" component={PlacesScreen} />
+            <Tab.Screen name="Bookmarks" component={BookmarksScreen} />
+            <Tab.Screen name="AddRecipe" component={AddRecipeScreen} />
+            <Tab.Screen name="News" component={NewsScreen} />
+            <Tab.Screen name="Search" component={SearchScreen} />
+          </Tab.Navigator>
+        )}
+      </Stack.Screen>
+      <Stack.Screen 
+        name="RecipeDetail" 
+        component={RecipeDetailScreen}
+        options={{
+          headerShown: true,
+          title: 'Détails de la recette',
+          headerTintColor: '#F28DEB',
+        }}
+      />
+    </Stack.Navigator>
   );
 };
 
