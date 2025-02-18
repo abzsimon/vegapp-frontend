@@ -34,7 +34,7 @@ export default function PlacesScreen() {
   const handleInputChange = async (inputValue) => {
     console.log(inputValue);
     const response = await fetch(
-      `http://192.168.206.57:3000/commerces/ingredientsCpf`,
+      `http://192.168.1.68:3000/commerces/ingredientsCpf`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,13 +42,13 @@ export default function PlacesScreen() {
       }
     );
     const data = await response.json();
-    console.log("résultat de la query sur la collection ingredientsCpf",data);
+    console.log("résultat de la query sur la collection ingredientsCpf", data);
     return data.ingredients.map((e) => ({ ...e, _searchName: e.title }));
   };
 
   // pour sélectionner un ingrédient de la base de données retourné par la barre de recherche, pour le renvoyer à l'API agencebio
   const handleSelection = (result) => {
-    console.log("tu as dispatch l'ingrédient suivant",result);
+    console.log("tu as dispatch l'ingrédient suivant", result);
     dispatch(addIngredient({ id: result.id, title: result._searchName }));
   };
 
@@ -57,20 +57,50 @@ export default function PlacesScreen() {
     dispatch(removeIngredient(ingredient));
   };
 
-  console.log("voici le contenu du reducer", SavedIngredients)
+  console.log("voici le contenu du reducer", SavedIngredients);
 
   const getBuisnessesWhoSellTheProducts = async (ingredients) => {
-    const response = await fetch(
-      `https://opendata.agencebio.org/api/gouv/operateurs/?lat=${location.coords.latitude}&lng=${location.coords.longitude}&filtrerVenteDetailinteger=1&filtrerRestaurantsinteger=1&filtrerGrandeSurfaceinteger=1&filtrerCommercantsEtArtisansinteger=1&codesProduits=${ingredients}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nom: inputValue }),
+    let prodList = ingredients.map((e) => e.id).join(",");
+    const url = `https://opendata.agencebio.org/api/gouv/operateurs/?codesProduits=${prodList}&lat=${location.coords.latitude}&lng=${location.coords.longitude}&nb=50`;
+    console.log("📤 Requesting API:", url);
+    try {
+      const response = await fetch(url, { method: "GET" });
+      console.log(`Status Code: ${response.status}`);
+      if (!response.ok) {
+        console.error("API returned an error:", response.status);
+        return null;
       }
-    );
-    const data = await response.json();
-    console.log("résultat de la query sur la collection ingredientsCpf",data);
-    return data.ingredients.map((e) => ({ ...e, _searchName: e.title }));
+      console.log("📥 Response received, waiting for JSON parsing...");
+      const data = await response.json();
+      console.log(url);
+      let shopList = [];
+      data.items.forEach((shop) => {
+        shop.adressesOperateurs.forEach((adress) => {
+          let shopInfo = {
+            name: shop.denominationcourante,
+            tel: shop.telephoneNational,
+            siret: shop.siret,
+            site:
+              shop.siteWebs.length > 0
+                ? shop.siteWebs.map((site) => site.url)
+                : [],
+            lat: adress.lat,
+            lng: adress.long,
+            adress: adress.lieu,
+            cp: adress.codePostal,
+            ville: adress.ville,
+          };
+
+          shopList.push(shopInfo);
+        });
+      });
+      console.log(shopList.length, data.items.length);
+      console.log(shopList);
+      return data;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return null;
+    }
   };
 
   return (
@@ -99,6 +129,12 @@ export default function PlacesScreen() {
         ) : (
           <Text>Aucun ingrédient sélectionné...</Text>
         )}
+        <TouchableOpacity
+          style={styles.SavedIngredient}
+          onPress={() => getBuisnessesWhoSellTheProducts(SavedIngredients)}
+        >
+          <Text>Lancer la recherche</Text>
+        </TouchableOpacity>
       </SafeAreaView>
       {location ? (
         <MapView
@@ -122,7 +158,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   h1: {
     fontSize: 50,
