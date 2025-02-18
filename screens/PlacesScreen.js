@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { Dimensions } from "react-native";
 import * as Location from "expo-location";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -13,6 +13,7 @@ import { addIngredient, removeIngredient } from "../reducers/user";
 export default function PlacesScreen() {
   const [location, setLocation] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [markers, setMarkers] = useState([]);
   const headerHeight = useHeaderHeight();
   const dispatch = useDispatch();
 
@@ -96,7 +97,16 @@ export default function PlacesScreen() {
       });
       console.log(shopList.length, data.items.length);
       console.log(shopList);
-      return data;
+      const markers = shopList.map((data, i) => {
+        return (
+          <Marker
+            key={i}
+            coordinate={{ latitude: data.lat, longitude: data.lng }}
+            title={data.name}
+          />
+        );
+      });
+      return markers
     } catch (error) {
       console.error("Fetch error:", error);
       return null;
@@ -131,7 +141,10 @@ export default function PlacesScreen() {
         )}
         <TouchableOpacity
           style={styles.SavedIngredient}
-          onPress={() => getBuisnessesWhoSellTheProducts(SavedIngredients)}
+          onPress={async () => {
+            const fetchedMarkers = await getBuisnessesWhoSellTheProducts(SavedIngredients);
+            setMarkers(fetchedMarkers)
+          }}
         >
           <Text>Lancer la recherche</Text>
         </TouchableOpacity>
@@ -145,7 +158,9 @@ export default function PlacesScreen() {
             latitudeDelta: 0.1,
             longitudeDelta: 0.1,
           }}
-        ></MapView>
+        >
+          {markers}
+        </MapView>
       ) : (
         <Text>Fetching coordinates...</Text>
       )}
