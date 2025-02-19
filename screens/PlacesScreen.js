@@ -103,6 +103,7 @@ export default function PlacesScreen() {
             key={i}
             coordinate={{ latitude: data.lat, longitude: data.lng }}
             title={data.name}
+            onPress={() => console.log("prout")}
           />
         );
       });
