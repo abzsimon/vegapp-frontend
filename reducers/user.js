@@ -7,6 +7,7 @@ const initialState = {
   favrecipes: [],
   favshops: [],
   regime: [],
+  ingredients: [],
 };
 
 export const userSlice = createSlice({
@@ -23,6 +24,12 @@ export const userSlice = createSlice({
     removeRecipe: (state, action) => {
       state.favrecipes.filter(e => e !== action.payload)
     },
+    addIngredient: (state, action) => {
+      state.ingredients.push(action.payload)
+    },
+    removeIngredient: (state, action) => {
+      state.ingredients = state.ingredients.filter(e => e.id !== action.payload.id);
+    },    
     addShop: (state, action) => {
       state.favshops.push(action.payload)
     },
@@ -45,6 +52,8 @@ export const {
   logoutUser,
   addRecipe,
   removeRecipe,
+  addIngredient,
+  removeIngredient,
   addShop,
   removeShop,
   addDiet,
