@@ -35,7 +35,7 @@ export default function PlacesScreen() {
   const handleInputChange = async (inputValue) => {
     console.log(inputValue);
     const response = await fetch(
-      `http://192.168.1.68:3000/commerces/ingredientsCpf`,
+      `http://192.168.1.12:3000/commerces/ingredientsCpf`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -107,7 +107,7 @@ export default function PlacesScreen() {
           />
         );
       });
-      return markers
+      return markers;
     } catch (error) {
       console.error("Fetch error:", error);
       return null;
@@ -116,7 +116,7 @@ export default function PlacesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.h1}>Vegapp</Text>
+      <Header></Header>
       <Text style={styles.h2}>Trouvez un commerce</Text>
       <SearchContainer
         onInputChange={handleInputChange}
@@ -143,8 +143,10 @@ export default function PlacesScreen() {
         <TouchableOpacity
           style={styles.SavedIngredient}
           onPress={async () => {
-            const fetchedMarkers = await getBuisnessesWhoSellTheProducts(SavedIngredients);
-            setMarkers(fetchedMarkers)
+            const fetchedMarkers = await getBuisnessesWhoSellTheProducts(
+              SavedIngredients
+            );
+            setMarkers(fetchedMarkers);
           }}
         >
           <Text>Lancer la recherche</Text>
@@ -194,13 +196,19 @@ const styles = StyleSheet.create({
   SavedIngredient: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: "darksalmon",
-    borderRadius: 200,
-    padding: 5,
-    margin: 5,
+    borderColor: "#F28DEB", // Mise à jour de la couleur pour matcher le thème
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    marginRight: 10,
   },
   IngredientsContainer: {
     flexDirection: "row",
+  },
+
+  ingredientText: {
+    color: "#F28DEB",
   },
 });

@@ -115,8 +115,8 @@ const TabNavigator = () => {
 };
 
 // REDUX
-// persistor.purge().then()
-// AsyncStorage.clear().then()
+//persistor.purge().then()
+//AsyncStorage.clear().then()
 
 // APP
 export default function App() {
@@ -126,13 +126,13 @@ export default function App() {
         <SafeAreaView style={{ flex: 1 }}>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen 
+            name="Sign-in-up" 
+            component={HomeScreen} />
               <Stack.Screen
             name="DrawerNavigator"
             component={DrawerNavigator}
               />
-            <Stack.Screen 
-            name="Sign-in-up" 
-            component={HomeScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaView>

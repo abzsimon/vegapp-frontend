@@ -1,13 +1,10 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 
-import Diets from "../components/diets"
-
 function Header(props) {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.h1}>VEGAPP</Text>
       <Text style={styles.h2}>{props.screenType}</Text>
-      <Diets />
     </SafeAreaView>
   );
 }

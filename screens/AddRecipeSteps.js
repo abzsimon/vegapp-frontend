@@ -47,6 +47,14 @@ export default function AddRecipeSteps() {
       setIsLoading(true);
       setError(null);
 
+      const ingredientsArray = recipeData.ingredients.split('\n')
+      .filter(ingredient => ingredient.trim() !== '')
+      .map(ingredient => ({
+        name: ingredient.trim(),
+        quantity: 1, // Default quantity
+        unit: '', // Empty unit
+      }));
+
       const finalRecipeData = {
         ...recipeData,
         steps: steps.filter((step) => step.trim() !== ""),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -7,27 +7,27 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Diet from '../components/diets'; // Réutilisation du composant Diet
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import Diet from "../components/diets"; // Réutilisation du composant Diet
 
 const CATEGORIES = [
-  ['Entrées', 'Plats', 'Desserts'],
-  ['Fêtes', 'Fast-food', 'Healthy'],
-  ['Afrique', 'Asie', 'Latino'],
+  ["Entrées", "Plats", "Desserts"],
+  ["Fêtes", "Fast-food", "Healthy"],
+  ["Afrique", "Asie", "Latino"],
 ];
 
-const DIFFICULTY_LEVELS = ['Facile', 'Moyen', 'Difficile'];
+const DIFFICULTY_LEVELS = ["Facile", "Moyen", "Difficile"];
 
 export default function AddRecipeScreen() {
   const navigation = useNavigation();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [difficulty, setDifficulty] = useState('');
-  const [cost, setCost] = useState('');
-  const [duration, setDuration] = useState('');
-  const [ingredients, setIngredients] = useState('');
+  const [difficulty, setDifficulty] = useState("");
+  const [cost, setCost] = useState("");
+  const [duration, setDuration] = useState("");
+  const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,15 +44,15 @@ export default function AddRecipeScreen() {
   // Fonction pour transformer les catégories en format backend
   const transformCategory = (category) => {
     const categoryMap = {
-      'Entrées': 'STARTER',
-      'Plats': 'MAIN',
-      'Desserts': 'DESSERT',
-      'Fêtes': 'PARTY',
-      'Fast-food': 'FAST FOOD',
-      'Healthy': 'HEALTHY',
-      'Afrique': 'AFRICA',
-      'Asie': 'ASIA',
-      'Latino': 'LATINO',
+      Entrées: "STARTER",
+      Plats: "MAIN",
+      Desserts: "DESSERT",
+      Fêtes: "PARTY",
+      "Fast-food": "FAST FOOD",
+      Healthy: "HEALTHY",
+      Afrique: "AFRICA",
+      Asie: "ASIA",
+      Latino: "LATINO",
     };
     return categoryMap[category];
   };
@@ -70,18 +70,18 @@ export default function AddRecipeScreen() {
         difficulty: difficulty.toUpperCase(),
         cost: parseFloat(cost),
         duration: parseInt(duration),
-        ingredients: ingredients.split('\n').map(ingredient => ({
+        ingredients: ingredients.split("\n").map((ingredient) => ({
           name: ingredient.trim(),
           quantity: 0,
-          unit: ''
+          unit: "",
         })),
-        steps: steps
+        steps: steps,
       };
 
-      const response = await fetch('http://192.168.1.12:3000/recipes', {
-        method: 'POST',
+      const response = await fetch("http://192.168.1.12:3000/recipes", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(recipeData),
       });
@@ -89,13 +89,13 @@ export default function AddRecipeScreen() {
       const data = await response.json();
 
       if (data.result) {
-        navigation.navigate('Search'); // Redirection après succès
+        navigation.navigate("Search"); // Redirection après succès
       } else {
         setError(data.error);
       }
     } catch (err) {
-      setError('Erreur lors de la création de la recette');
-      console.error('Submit error:', err);
+      setError("Erreur lors de la création de la recette");
+      console.error("Submit error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +108,14 @@ export default function AddRecipeScreen() {
 
         {/* Composant Diet réutilisé */}
         <Diet />
-
+        <Text style={styles.sectionTitle}>Titre de la recette</Text>
+        <TextInput
+          style={styles.titleInput}
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Titre de votre recette"
+          numberOfLines={1}
+        />
         <Text style={styles.sectionTitle}>Catégories</Text>
         {/* Grille de catégories */}
         {CATEGORIES.map((row, rowIndex) => (
@@ -118,7 +125,8 @@ export default function AddRecipeScreen() {
                 key={category}
                 style={[
                   styles.categoryButton,
-                  selectedCategories.includes(category) && styles.categoryButtonSelected,
+                  selectedCategories.includes(category) &&
+                    styles.categoryButtonSelected,
                 ]}
                 onPress={() => toggleCategory(category)}
               >
@@ -181,19 +189,23 @@ export default function AddRecipeScreen() {
         />
 
         {/* Bouton pour passer aux étapes */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.nextButton}
-          onPress={() => navigation.navigate('AddRecipeSteps', { 
-            recipeData: {
+          onPress={() => {
+            const recipeData = {
               title,
               description,
               selectedCategories,
               difficulty,
               cost,
               duration,
-              ingredients
-            }
-          })}
+              ingredients,
+            };
+
+            console.log("Navigating with recipeData:", recipeData); // Debugging
+
+            navigation.navigate("AddRecipeSteps", { recipeData });
+          }}
         >
           <Text style={styles.nextButtonText}>Ajouter les étapes →</Text>
         </TouchableOpacity>
@@ -207,66 +219,66 @@ export default function AddRecipeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 15,
     marginTop: 25,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginVertical: 10,
   },
   categoryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   categoryButton: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     padding: 10,
     borderRadius: 10,
     marginHorizontal: 5,
-    alignItems: 'center',
+    alignItems: "center",
   },
   categoryButtonSelected: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: '#F28DEB',
+    borderColor: "#F28DEB",
   },
   categoryText: {
-    color: '#F28DEB',
+    color: "#F28DEB",
   },
   difficultyContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   difficultyButton: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     padding: 10,
     borderRadius: 10,
     marginHorizontal: 5,
-    alignItems: 'center',
+    alignItems: "center",
   },
   difficultyButtonSelected: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: '#F28DEB',
+    borderColor: "#F28DEB",
   },
   difficultyText: {
-    color: '#F28DEB',
+    color: "#F28DEB",
   },
   rowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   halfInput: {
@@ -275,36 +287,42 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     marginBottom: 5,
-    color: '#666',
+    color: "#666",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 10,
     padding: 10,
   },
   ingredientsInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 10,
     padding: 10,
     minHeight: 100,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   nextButton: {
-    backgroundColor: '#F28DEB',
+    backgroundColor: "#F28DEB",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   nextButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   errorText: {
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
     marginTop: 10,
   },
+  titleInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 10,
+  }
 });
