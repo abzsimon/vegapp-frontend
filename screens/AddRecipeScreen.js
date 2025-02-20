@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
+import AddRecipe from '../components/addRecipe'
 
 export default function App() {
  return (
    <View style={styles.container}>
-     <Text>Add recipe screen</Text>
+     <AddRecipe></AddRecipe>
    </View>  );
 }
 
@@ -14,4 +15,4 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
     },
-})
+})//

@@ -35,7 +35,7 @@ export default function PlacesScreen() {
   const handleInputChange = async (inputValue) => {
     console.log(inputValue);
     const response = await fetch(
-      `http://192.168.1.68:3000/commerces/ingredientsCpf`,
+      `http://192.168.1.12:3000/commerces/ingredientsCpf`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -230,11 +230,13 @@ const styles = StyleSheet.create({
   SavedIngredient: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: "darksalmon",
-    borderRadius: 200,
-    padding: 5,
-    margin: 5,
+    borderColor: "#F28DEB", // Mise à jour de la couleur pour matcher le thème
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    marginRight: 10,
   },
   IngredientsContainer: {
     flexDirection: "row",

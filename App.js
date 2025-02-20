@@ -32,7 +32,9 @@ import SearchScreen from "./screens/SearchScreen";
 import NewsScreen from "./screens/NewsScreen";
 import AddRecipeScreen from "./screens/AddRecipeScreen";
 import ProposedRecipesScreen from "./screens/ProposedRecipesScreen";
+
 import RecipeDetailScreen from "./screens/RecipeDetailScreen";
+import AddRecipeSteps from "./screens/RecipeDetailScreen";
 
 // création des navigateurs
 const Stack = createNativeStackNavigator();
@@ -99,13 +101,22 @@ const TabNavigator = () => {
           headerTintColor: '#F28DEB',
         }}
       />
+      <Stack.Screen 
+        name="AddRecipeSteps" 
+        component={AddRecipeSteps}
+        options={{
+          headerShown: true,
+          title: 'Détails de la recette',
+          headerTintColor: '#F28DEB',
+        }}
+      />
     </Stack.Navigator>
   );
 };
 
 // REDUX
-// persistor.purge().then()
-// AsyncStorage.clear().then()
+//persistor.purge().then()
+//AsyncStorage.clear().then()
 
 // APP
 export default function App() {
@@ -115,13 +126,13 @@ export default function App() {
         <SafeAreaView style={{ flex: 1 }}>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen 
+            name="Sign-in-up" 
+            component={HomeScreen} />
               <Stack.Screen
             name="DrawerNavigator"
             component={DrawerNavigator}
               />
-            <Stack.Screen 
-            name="Sign-in-up" 
-            component={HomeScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaView>
