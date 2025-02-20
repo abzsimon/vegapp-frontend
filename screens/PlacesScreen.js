@@ -1,11 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import { Dimensions } from "react-native";
 import * as Location from "expo-location";
 import { useHeaderHeight } from "@react-navigation/elements";
-import Header from "../components/header";
 import SearchContainer from "../components/searchContainer";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { addIngredient, removeIngredient } from "../reducers/user";
@@ -14,6 +13,7 @@ export default function PlacesScreen() {
   const [location, setLocation] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [markers, setMarkers] = useState([]);
+  const [infoBubble, setInfoBubble] = useState(null);
   const headerHeight = useHeaderHeight();
   const dispatch = useDispatch();
 
@@ -81,12 +81,16 @@ export default function PlacesScreen() {
             name: shop.denominationcourante,
             tel: shop.telephoneNational,
             siret: shop.siret,
-            site:
+            categories:
+              shop.categories.length > 0
+                ? shop.categories.map((cat) => cat.nom)
+                : [],
+            sites:
               shop.siteWebs.length > 0
                 ? shop.siteWebs.map((site) => site.url)
                 : [],
-            lat: adress.lat,
-            lng: adress.long,
+            lat: Number(adress.lat),
+            lng: Number(adress.long),
             adress: adress.lieu,
             cp: adress.codePostal,
             ville: adress.ville,
@@ -102,21 +106,20 @@ export default function PlacesScreen() {
           <Marker
             key={i}
             coordinate={{ latitude: data.lat, longitude: data.lng }}
-            title={data.name}
-            onPress={() => console.log("prout")}
-          />
+            onPress={() => setInfoBubble(data)}
+          ></Marker>
         );
       });
-      return markers
+      return markers;
     } catch (error) {
       console.error("Fetch error:", error);
       return null;
     }
   };
+  console.log(infoBubble);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.h1}>Vegapp</Text>
       <Text style={styles.h2}>Trouvez un commerce</Text>
       <SearchContainer
         onInputChange={handleInputChange}
@@ -143,8 +146,10 @@ export default function PlacesScreen() {
         <TouchableOpacity
           style={styles.SavedIngredient}
           onPress={async () => {
-            const fetchedMarkers = await getBuisnessesWhoSellTheProducts(SavedIngredients);
-            setMarkers(fetchedMarkers)
+            const fetchedMarkers = await getBuisnessesWhoSellTheProducts(
+              SavedIngredients
+            );
+            setMarkers(fetchedMarkers);
           }}
         >
           <Text>Lancer la recherche</Text>
@@ -165,6 +170,40 @@ export default function PlacesScreen() {
       ) : (
         <Text>Fetching coordinates...</Text>
       )}
+      {infoBubble && (
+        <SafeAreaView style={styles.popup}>
+          <Text style={styles.popuph1}>
+            {infoBubble.name}
+          </Text>
+          {infoBubble.categories && (
+            <View style={styles.tagContainer}>
+              {infoBubble.categories.map((category, index) => (
+                <View key={index}>
+                  <Text style={{fontStyle : "italic"}}>{category}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          {infoBubble.sites && (
+            <View style={styles.tagContainer}>
+              {infoBubble.sites.map((site, index) => (
+                <View key={index} style={styles.tagBubble}>
+                  <Text style={styles.tagText}>{site.length > 25 ? site.substring(0, 25) + "..." : site}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          {infoBubble.adress && (
+            <Text style={{ fontSize: 14 }}>{infoBubble.adress}</Text>
+          )}
+          {infoBubble.cp && (
+            <Text style={{ fontSize: 14 }}>{infoBubble.cp}</Text>
+          )}
+          {infoBubble.ville && (
+            <Text style={{ fontSize: 14 }}>{infoBubble.ville}</Text>
+          )}
+        </SafeAreaView>
+      )}
     </SafeAreaView>
   );
 }
@@ -176,16 +215,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
   },
-  h1: {
-    fontSize: 50,
-  },
   h2: {
     fontSize: 20,
+    margin : 2,
   },
   map: {
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.6,
-    marginVertical: 10,
+    height: Dimensions.get("window").height * 0.65,
   },
   dropdown: {
     width: Dimensions.get("window").width * 0.8,
@@ -203,4 +239,36 @@ const styles = StyleSheet.create({
   IngredientsContainer: {
     flexDirection: "row",
   },
+  popup: {
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    backgroundColor: "rgba(134, 132, 129, 0.80)",
+    padding: 10,
+    borderRadius: 20,
+    borderColor: "#6558F5",
+    borderWidth: 2,
+    position: "absolute",
+    zIndex: 1,
+    width: Dimensions.get("window").width * 0.8,
+    top: Dimensions.get("window").height * 0.6,
+  },
+  popuph1: {
+    fontSize : 14,
+    fontWeight : 600,
+  },
+  tagContainer : {
+    flexDirection: "row",
+    flexWrap: "wrap"
+  },
+  tagBubble : {
+    border : "solid",
+    borderColor : "black",
+    borderWidth : 2,
+    borderRadius : 20,
+    margin : 2,
+    paddingVertical : 2,
+    paddingHorizontal : 10,
+
+  }
 });
