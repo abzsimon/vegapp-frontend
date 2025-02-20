@@ -23,7 +23,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
 
   const fetchRecipeDetails = async () => {
     try {
-      const response = await fetch(`http://192.168.1.12:3000/recipes/${recipeId}`);
+      const response = await fetch(`http://192.168.1.68:3000/recipes/${recipeId}`);
       const data = await response.json();
       
       if (data.result) {
