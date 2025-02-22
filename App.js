@@ -34,7 +34,7 @@ import AddRecipeScreen from "./screens/AddRecipeScreen";
 import ProposedRecipesScreen from "./screens/ProposedRecipesScreen";
 
 import RecipeDetailScreen from "./screens/RecipeDetailScreen";
-import AddRecipeSteps from "./screens/RecipeDetailScreen";
+import AddRecipeSteps from "./screens/AddRecipeSteps";
 
 // création des navigateurs
 const Stack = createNativeStackNavigator();
@@ -106,7 +106,7 @@ const TabNavigator = () => {
         component={AddRecipeSteps}
         options={{
           headerShown: true,
-          title: 'Détails de la recette',
+          title: 'Ajout des étapes',
           headerTintColor: '#F28DEB',
         }}
       />

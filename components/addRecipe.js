@@ -9,7 +9,6 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Diet from "../components/diets"; // Réutilisation du composant Diet
 
 const CATEGORIES = [
   ["Entrées", "Plats", "Desserts"],
@@ -18,6 +17,8 @@ const CATEGORIES = [
 ];
 
 const DIFFICULTY_LEVELS = ["Facile", "Moyen", "Difficile"];
+const UNITS = ["g", "ml", "kg", "L", "càs", "càc", "pièce(s)"];
+const REGIMES = ['Vegan', 'Végé', 'Sans gluten', 'Bio'];
 
 export default function AddRecipeScreen() {
   const navigation = useNavigation();
@@ -27,10 +28,41 @@ export default function AddRecipeScreen() {
   const [difficulty, setDifficulty] = useState("");
   const [cost, setCost] = useState("");
   const [duration, setDuration] = useState("");
-  const [ingredients, setIngredients] = useState("");
+  const [ingredients, setIngredients] = useState([]);
   const [steps, setSteps] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentIngredient, setCurrentIngredient] = useState({
+    name: "",
+    quantity: "",
+    unit: "",
+  });
+  const [selectedRegimes, setSelectedRegimes] = useState([]);
+
+  const addIngredient = () => {
+    if (
+      !currentIngredient.name ||
+      !currentIngredient.quantity ||
+      !currentIngredient.unit
+    ) {
+      setError("Veuillez remplir tous les champs de l'ingrédient");
+      return;
+    }
+    setIngredients([
+      ...ingredients,
+      {
+        ...currentIngredient,
+        quantity: Number(currentIngredient.quantity),
+        icon: "📝", // Émoji par défaut
+      },
+    ]);
+    setCurrentIngredient({ name: "", quantity: "", unit: "" });
+    setError(null);
+  };
+
+  const removeIngredient = (index) => {
+    setIngredients(ingredients.filter((_, i) => i !== index));
+  };
 
   // Fonction pour gérer la sélection des catégories
   const toggleCategory = (category) => {
@@ -70,21 +102,20 @@ export default function AddRecipeScreen() {
         difficulty: difficulty.toUpperCase(),
         cost: parseFloat(cost),
         duration: parseInt(duration),
-        ingredients: ingredients.split("\n").map((ingredient) => ({
-          name: ingredient.trim(),
-          quantity: 0,
-          unit: "",
-        })),
+        ingredients: ingredients,
         steps: steps,
       };
 
-      const response = await fetch("http://192.168.1.12:3000/recipes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(recipeData),
-      });
+      const response = await fetch(
+        "http://192.168.1.12:3000/recipes",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(recipeData),
+        }
+      );
 
       const data = await response.json();
 
@@ -101,13 +132,46 @@ export default function AddRecipeScreen() {
     }
   };
 
+  const validateForm = () => {
+    if (
+      !title ||
+      !description ||
+      selectedCategories.length === 0 ||
+      !difficulty ||
+      !cost ||
+      !duration ||
+      ingredients.length === 0
+    ) {
+      setError("Veuillez remplir tous les champs obligatoires");
+      return false;
+    }
+    return true;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Text style={styles.title}>Proposer une recette</Text>
-
-        {/* Composant Diet réutilisé */}
-        <Diet />
+      <Text style={styles.sectionTitle}>Régimes alimentaires</Text>
+<View style={styles.regimeContainer}>
+  {REGIMES.map((regime) => (
+    <TouchableOpacity
+      key={regime}
+      style={[
+        styles.regimeButton,
+        selectedRegimes.includes(regime) && styles.regimeButtonSelected,
+      ]}
+      onPress={() => {
+        if (selectedRegimes.includes(regime)) {
+          setSelectedRegimes(selectedRegimes.filter(r => r !== regime));
+        } else {
+          setSelectedRegimes([...selectedRegimes, regime]);
+        }
+      }}
+    >
+      <Text style={styles.regimeText}>{regime}</Text>
+    </TouchableOpacity>
+  ))}
+</View>
         <Text style={styles.sectionTitle}>Titre de la recette</Text>
         <TextInput
           style={styles.titleInput}
@@ -115,6 +179,15 @@ export default function AddRecipeScreen() {
           onChangeText={setTitle}
           placeholder="Titre de votre recette"
           numberOfLines={1}
+        />
+        <Text style={styles.sectionTitle}>Description</Text>
+        <TextInput
+          style={styles.descriptionInput}
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Description de votre recette"
+          multiline
+          numberOfLines={3}
         />
         <Text style={styles.sectionTitle}>Catégories</Text>
         {/* Grille de catégories */}
@@ -179,32 +252,89 @@ export default function AddRecipeScreen() {
 
         {/* Ingrédients */}
         <Text style={styles.sectionTitle}>Ingrédients</Text>
-        <TextInput
-          style={styles.ingredientsInput}
-          value={ingredients}
-          onChangeText={setIngredients}
-          placeholder="Ingrédients (un par ligne)"
-          multiline
-          numberOfLines={4}
-        />
+<View style={styles.ingredientInputContainer}>
+  <View style={styles.ingredientRow}>
+    {/* Input Quantité */}
+    <TextInput
+      style={styles.quantityInput}
+      value={currentIngredient.quantity}
+      onChangeText={(text) =>
+        setCurrentIngredient({ ...currentIngredient, quantity: text })
+      }
+      placeholder="Qté"
+      keyboardType="numeric"
+    />
+    
+    {/* Input Nom de l'ingrédient */}
+    <TextInput
+      style={styles.ingredientNameInput}
+      value={currentIngredient.name}
+      onChangeText={(text) =>
+        setCurrentIngredient({ ...currentIngredient, name: text })
+      }
+      placeholder="Ingrédient"
+    />
+  </View>
+  
+  {/* Unités en dessous */}
+  <View style={styles.unitRow}>
+    {UNITS.map((unit) => (
+      <TouchableOpacity
+        key={unit}
+        style={[
+          styles.unitButton,
+          currentIngredient.unit === unit && styles.unitButtonSelected,
+        ]}
+        onPress={() => setCurrentIngredient({ ...currentIngredient, unit })}
+      >
+        <Text style={[
+          styles.unitText,
+          currentIngredient.unit === unit && styles.unitTextSelected,
+        ]}>
+          {unit}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+  
+  {/* Bouton Ajouter */}
+  <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
+    <Text style={styles.addButtonText}>Ajouter</Text>
+  </TouchableOpacity>
+</View>
+
+        {/* Liste des ingrédients ajoutés */}
+        {ingredients.map((ingredient, index) => (
+          <View key={index} style={styles.ingredientListItem}>
+            <Text style={styles.ingredientText}>
+              {ingredient.quantity} {ingredient.unit} de {ingredient.name}
+            </Text>
+            <TouchableOpacity onPress={() => removeIngredient(index)}>
+              <Text style={styles.removeButton}>×</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
 
         {/* Bouton pour passer aux étapes */}
         <TouchableOpacity
           style={styles.nextButton}
           onPress={() => {
-            const recipeData = {
-              title,
-              description,
-              selectedCategories,
-              difficulty,
-              cost,
-              duration,
-              ingredients,
-            };
+            if (validateForm()) {
+              const recipeData = {
+                title,
+                description,
+                selectedCategories,
+                difficulty,
+                cost,
+                duration,
+                ingredients,
+                regime: selectedRegimes,
+              };
 
-            console.log("Navigating with recipeData:", recipeData); // Debugging
+              console.log("Navigating with recipeData:", recipeData); // Debugging
 
-            navigation.navigate("AddRecipeSteps", { recipeData });
+              navigation.navigate("AddRecipeSteps", { recipeData });
+            }
           }}
         >
           <Text style={styles.nextButtonText}>Ajouter les étapes →</Text>
@@ -222,6 +352,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 15,
     marginTop: 25,
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  regimeContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 20,
+    gap: 10,
+  },
+  regimeButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#F28DEB',
+    backgroundColor: '#FFFFFF',
+  },
+  regimeButtonSelected: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#F28DEB',
+  },
+  regimeText: {
+    color: '#F28DEB',
   },
   title: {
     fontSize: 24,
@@ -233,6 +387,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginVertical: 10,
+  },
+  descriptionInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 10,
+    minHeight: 80,
+    textAlignVertical: "top",
+    marginBottom: 20,
   },
   categoryRow: {
     flexDirection: "row",
@@ -324,5 +487,100 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 10,
     padding: 10,
-  }
+  },
+  ingredientInputContainer: {
+    marginBottom: 100,
+    backgroundColor: '#F5F5F5',
+    padding: 15,
+    borderRadius: 10,
+  },
+  ingredientRow: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    gap: 10,
+  },
+  quantityInput: {
+    width: 70,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 8,
+    backgroundColor: '#fff',
+  },
+  unitContainer: {
+    flexDirection: "row",
+    marginRight: 8,
+  },
+  unitButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  unitButtonSelected: {
+    backgroundColor: '#F28DEB',
+    borderColor: '#F28DEB',
+  },
+  
+  unitText: {
+    color: "#333",
+  },
+
+  unitTextSelected: {
+    color: '#fff',
+  },
+
+  ingredientNameInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 8,
+    backgroundColor: '#fff',
+  },
+
+  unitRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 10,
+  },
+
+  addButton: {
+    backgroundColor: "#F28DEB",
+    width: "40%",
+    height: 30,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  ingredientListItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  ingredientText: {
+    flex: 1,
+  },
+  removeButton: {
+    color: "#F28DEB",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
+  },
 });
