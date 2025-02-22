@@ -35,7 +35,7 @@ export default function PlacesScreen() {
   const handleInputChange = async (inputValue) => {
     console.log(inputValue);
     const response = await fetch(
-      `http://192.168.1.12:3000/commerces/ingredientsCpf`,
+      `http://192.168.1.68:3000/commerces/ingredientsCpf`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -7,7 +7,7 @@ import { addDiet, removeDiet } from '../reducers/user';
 const REGIMES = ['Végé', 'Bio', 'Sans gluten', 'Vegan'];
 
 // Notre composant principal qui reçoit une prop pour notifier les changements
-export default function Diet({ onRegimeChange }) {
+export default function Diet({ onRegimeChange, style }) {
   // On initialise dispatch pour pouvoir envoyer des actions à Redux
   const dispatch = useDispatch();
   // On récupère les régimes de l'utilisateur depuis le state Redux
@@ -30,7 +30,7 @@ export default function Diet({ onRegimeChange }) {
 
   // La partie visuelle de notre composant
   return (
-    <View style={styles.regimeContainer}>
+    <View style={[styles.regimeContainer, style]}>
       {/* On map sur notre tableau de régimes pour créer un bouton pour chacun */}
       {REGIMES.map((regime) => (
         <TouchableOpacity

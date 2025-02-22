@@ -78,7 +78,7 @@ export default function AddRecipeScreen() {
         steps: steps,
       };
 
-      const response = await fetch("http://192.168.1.12:3000/recipes", {
+      const response = await fetch("http://192.168.1.68:3000/recipes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -201,9 +201,7 @@ export default function AddRecipeScreen() {
               duration,
               ingredients,
             };
-
             console.log("Navigating with recipeData:", recipeData); // Debugging
-
             navigation.navigate("AddRecipeSteps", { recipeData });
           }}
         >
