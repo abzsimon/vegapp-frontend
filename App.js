@@ -43,7 +43,7 @@ import NewsScreen from "./screens/NewsScreen";
 import AddRecipeScreen from "./screens/AddRecipeScreen";
 import ProposedRecipesScreen from "./screens/ProposedRecipesScreen";
 import RecipeDetailScreen from "./screens/RecipeDetailScreen";
-import AboutScreen from "./screens/AboutScreen"
+import AddRecipeSteps from "./screens/AddRecipeSteps";
 
 // création des navigateurs
 const Stack = createNativeStackNavigator();
@@ -138,8 +138,17 @@ const TabNavigator = () => {
         component={RecipeDetailScreen}
         options={{
           headerShown: true,
-          title: "Détails de la recette",
-          headerTintColor: "#F28DEB",
+          title: 'Détails de la recette',
+          headerTintColor: '#F28DEB',
+        }}
+      />
+      <Stack.Screen 
+        name="AddRecipeSteps" 
+        component={AddRecipeSteps}
+        options={{
+          headerShown: true,
+          title: 'Ajout des étapes',
+          headerTintColor: '#F28DEB',
         }}
       />
     </Stack.Navigator>

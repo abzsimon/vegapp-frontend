@@ -37,52 +37,95 @@ export default function AddRecipeSteps() {
     setSteps(newSteps);
   };
 
+// Validation des données avant soumission
+const validateRecipe = () => {
+  if (steps.length === 0) {
+    setError("Ajoutez au moins une étape");
+    return false;
+  }
+
+  if (steps.some((step) => step.trim() === "")) {
+    setError("Toutes les étapes doivent être remplies");
+    return false;
+  }
+
+  return true;
+};
+
+const transformCategory = (category) => {
+  const categoryMap = {
+    'Entrées': 'STARTER',
+    'Plats': 'MAIN',
+    'Desserts': 'DESSERT',
+    'Fêtes': 'PARTY',
+    'Fast-food': 'FAST FOOD',
+    'Healthy': 'HEALTHY',
+    'Afrique': 'AFRICA',
+    'Asie': 'ASIA',
+    'Latino': 'LATINO'
+  };
+  return categoryMap[category];
+};
+
+const transformDifficulty = (difficulty) => {
+  const difficultyMap = {
+    'Facile': 'EASY',
+    'Moyen': 'MEDIUM',
+    'Difficile': 'HARD'
+  };
+  return difficultyMap[difficulty] || 'MEDIUM';
+};
   // Soumettre la recette complète
   const submitRecipe = async () => {
     try {
       if (!validateRecipe()) {
         return;
       }
-
+  
       setIsLoading(true);
       setError(null);
-
-      const ingredientsArray = recipeData.ingredients.split('\n')
-      .filter(ingredient => ingredient.trim() !== '')
-      .map(ingredient => ({
-        name: ingredient.trim(),
-        quantity: 1, // Default quantity
-        unit: '', // Empty unit
-      }));
-
+  
       const finalRecipeData = {
-        ...recipeData,
-        steps: steps.filter((step) => step.trim() !== ""),
+        title: recipeData.title,
+        description: recipeData.description || recipeData.title,
+        regime: recipeData.regime || [],
+        ingredients: recipeData.ingredients,
+        category: transformCategory(recipeData.selectedCategories[0]),
+        difficulty: transformDifficulty(recipeData.difficulty),
+        cost: parseFloat(recipeData.cost) || 0,
+        duration: parseInt(recipeData.duration) || 0,
+        steps: steps.filter(step => step.trim() !== '')
       };
-
+  
+      console.log('Sending recipe data:', finalRecipeData); // Debug log
+  
       const response = await fetch("http://192.168.1.12:3000/recipes", {
-        method: "POST",
+        method: "POST", 
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(finalRecipeData),
+        body: JSON.stringify(finalRecipeData)
       });
-
+  
       const data = await response.json();
-
+      console.log('Server response:', data); // Debug log
+  
       if (data.result) {
-        navigation.navigate("Search"); // Retour à la recherche après succès
+        // Navigate and replace the current screen to prevent going back
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Search' }],
+        });
       } else {
-        setError(data.error);
+        setError(data.error || 'Une erreur est survenue');
       }
     } catch (err) {
+      console.error('Submit error:', err);
       setError("Erreur lors de la création de la recette");
-      console.error("Submit error:", err);
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -143,13 +186,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 15,
-    marginTop: 25,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
+    paddingTop: 15,
   },
   subtitle: {
     fontSize: 16,
@@ -159,7 +202,10 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     marginBottom: 15,
-    position: "relative", // Pour positionner le bouton de suppression
+    position: "relative", 
+    marginLeft: 15,
+    marginRight: 15,
+
   },
   stepNumber: {
     fontSize: 16,
@@ -174,7 +220,7 @@ const styles = StyleSheet.create({
     padding: 10,
     minHeight: 80,
     textAlignVertical: "top",
-    paddingRight: 40, // Espace pour le bouton de suppression
+    paddingRight: 40, 
   },
   removeButton: {
     position: "absolute",
@@ -202,6 +248,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#F28DEB",
     borderStyle: "dashed",
+    marginLeft: 15,
+    marginRight: 15,
   },
   addButtonText: {
     color: "#F28DEB",
@@ -214,6 +262,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     marginBottom: 30,
+    marginLeft: 15,
+    marginRight: 15,
   },
   submitButtonDisabled: {
     opacity: 0.7,
@@ -229,17 +279,3 @@ const styles = StyleSheet.create({
   },
 });
 
-// Validation des données avant soumission
-const validateRecipe = () => {
-  if (steps.length === 0) {
-    setError("Ajoutez au moins une étape");
-    return false;
-  }
-
-  if (steps.some((step) => step.trim() === "")) {
-    setError("Toutes les étapes doivent être remplies");
-    return false;
-  }
-
-  return true;
-};
