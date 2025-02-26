@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -6,8 +6,9 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
-} from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+} from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
 
 export default function RecipeDetailScreen({ route, navigation }) {
   const { recipeId } = route.params;
@@ -15,6 +16,42 @@ export default function RecipeDetailScreen({ route, navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedRating, setSelectedRating] = useState(0);
+  const userToken = useSelector((state) => state.user.token);
+  const userFavRecipes = useSelector((state) => state.user.favrecipes);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  useEffect(() => {
+    if (recipe && userFavRecipes) {
+      setIsBookmarked(userFavRecipes.includes(recipe._id));
+    }
+  }, [recipe, userFavRecipes]);
+
+  const toggleBookmark = async () => {
+    try {
+      const endpoint = "http://192.168.1.12:3000/users/bookmark";
+      const method = isBookmarked ? "DELETE" : "POST";
+
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: userToken,
+          recipeId: recipe._id,
+        }),
+      });
+
+      const data = await response.json();
+      console.log(data)
+      if (data.result) {
+        setIsBookmarked(!isBookmarked);
+        // Vous pourriez également mettre à jour le reducer user ici
+      }
+    } catch (err) {
+      console.error("Erreur lors de la modification des favoris:", err);
+    }
+  };
 
   // Récupération des détails de la recette
   useEffect(() => {
@@ -23,16 +60,18 @@ export default function RecipeDetailScreen({ route, navigation }) {
 
   const fetchRecipeDetails = async () => {
     try {
-      const response = await fetch(`http://192.168.1.68:3000/recipes/${recipeId}`);
+      const response = await fetch(
+        `http://192.168.1.12:3000/recipes/${recipeId}`
+      );
       const data = await response.json();
-      
+
       if (data.result) {
         setRecipe(data.recipe);
       } else {
         setError(data.error);
       }
     } catch (err) {
-      setError('Erreur lors du chargement de la recette');
+      setError("Erreur lors du chargement de la recette");
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -48,7 +87,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
         disabled={!isInteractive}
       >
         <FontAwesome
-          name={index < rating ? 'star' : 'star-o'}
+          name={index < rating ? "star" : "star-o"}
           size={isInteractive ? 24 : 16}
           color="#F28DEB"
           style={styles.star}
@@ -60,31 +99,44 @@ export default function RecipeDetailScreen({ route, navigation }) {
   // Fonction pour soumettre une note
   const submitRating = async () => {
     try {
-      const response = await fetch(`http://192.168.1.12:3000/recipes/${recipeId}/vote`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ note: selectedRating }),
-      });
+      const response = await fetch(
+        `http://192.168.1.12:3000/recipes/${recipeId}/vote`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ note: selectedRating }),
+        }
+      );
       const data = await response.json();
       if (data.result) {
         // Mettre à jour les détails de la recette suite au vote
         fetchRecipeDetails();
       }
     } catch (err) {
-      console.error('Error submitting rating:', err);
+      console.error("Error submitting rating:", err);
     }
   };
 
   if (isLoading) return <Text>Chargement...</Text>;
-  if (error) return <Text style={styles.errorText}>{error}</Text>; 
+  if (error) return <Text style={styles.errorText}>{error}</Text>;
   if (!recipe) return <Text>Recette non trouvée</Text>;
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.bookmarkButton}
+            onPress={toggleBookmark}
+          >
+            <FontAwesome
+              name={isBookmarked ? "bookmark" : "bookmark-o"}
+              size={35}
+              color="#F28DEB"
+            />
+          </TouchableOpacity>
           <Text style={styles.title}>{recipe.title}</Text>
           <View style={styles.ratingContainer}>
             {renderStars(recipe.averageNote)}
@@ -146,7 +198,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
           <View style={styles.ratingStars}>
             {renderStars(selectedRating, true)}
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.submitButton}
             onPress={submitRating}
             disabled={selectedRating === 0}
@@ -162,7 +214,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
     padding: 15,
@@ -170,101 +222,108 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   ratingContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 10,
   },
   tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     padding: 15,
     paddingTop: 1,
     paddingBottom: 7,
     gap: 10,
   },
   tagPill: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#F28DEB',
+    borderColor: "#F28DEB",
   },
   tagText: {
-    color: '#F28DEB',
+    color: "#F28DEB",
   },
   infoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     padding: 15,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     marginHorizontal: 15,
     borderRadius: 10,
   },
   infoItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   infoLabel: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   infoValue: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   section: {
     padding: 15,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 15,
   },
   ingredientRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
+    borderBottomColor: "#F5F5F5",
   },
   stepContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 15,
   },
   stepNumber: {
     width: 25,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   stepText: {
     flex: 1,
   },
   ratingSection: {
     padding: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   ratingStars: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 15,
   },
   star: {
     marginHorizontal: 2,
   },
   submitButton: {
-    backgroundColor: '#F28DEB',
+    backgroundColor: "#F28DEB",
     paddingHorizontal: 30,
     paddingVertical: 10,
     borderRadius: 20,
   },
   submitButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   errorText: {
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
     margin: 20,
+  },
+
+  bookmarkButton: {
+    position: 'absolute',
+    right: 15,
+    top: 15,
+    padding: 10,
   },
 });

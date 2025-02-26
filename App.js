@@ -44,6 +44,7 @@ import AddRecipeScreen from "./screens/AddRecipeScreen";
 import ProposedRecipesScreen from "./screens/ProposedRecipesScreen";
 import RecipeDetailScreen from "./screens/RecipeDetailScreen";
 import AddRecipeSteps from "./screens/AddRecipeSteps";
+import AboutScreen from "./screens/AboutScreen";
 
 // création des navigateurs
 const Stack = createNativeStackNavigator();

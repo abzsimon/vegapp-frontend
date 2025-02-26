@@ -76,7 +76,7 @@ export default function SearchScreen() {
 
       // Faire la requête au backend
       const response = await fetch(
-        `http://192.168.1.68:3000/recipes/search?${searchParams}`,
+        `http://192.168.1.12:3000/recipes/search?${searchParams}`,
       );
       const data = await response.json();
 
