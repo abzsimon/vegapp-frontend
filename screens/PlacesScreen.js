@@ -178,7 +178,7 @@ export default function PlacesScreen() {
       console.error("Erreur lors de la modification des favoris:", err);
     }
   };
-
+//test
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.h2}>Trouvez un commerce</Text>
