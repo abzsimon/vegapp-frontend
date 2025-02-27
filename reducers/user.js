@@ -22,7 +22,7 @@ export const userSlice = createSlice({
       state.favrecipes.push(action.payload)
     },
     removeRecipe: (state, action) => {
-      state.favrecipes.filter(e => e !== action.payload)
+      state.favrecipes = state.favrecipes.filter(e => e !== action.payload);
     },
     addIngredient: (state, action) => {
       state.ingredients.push(action.payload)
