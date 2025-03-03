@@ -93,7 +93,7 @@ function CustomDrawerContent(props) {
     }
   };
   console.log(userInfo);
-  
+
   return (
     <DrawerContentScrollView {...props}>
     <DrawerItemList {...props} />
@@ -107,7 +107,7 @@ function CustomDrawerContent(props) {
             <SafeAreaView style={styles.userPrefs}>
               <FontAwesome size={25} name="user-circle-o" />
               <SafeAreaView style={styles.toggleLines}>
-                {/* on vient mapper sur un tableau de quatre strings contenant les types de régime pour générer quatre couples switch/texte qui active/desactive le régime dans le reducer en utilisant la fonction toggleDiet*/}
+                {/* on vient mapper sur un tableau de trois strings contenant les types de régime pour générer trois couples switch/texte qui active/desactive le régime dans le reducer & dans la DB en utilisant la fonction toggleDiet*/}
                 {["vegan", "veggie", "gluten"].map((diet) => (
                   <SafeAreaView key={diet} style={styles.btn}>
                     <Text>{diet.charAt(0).toUpperCase() + diet.slice(1)}</Text>
@@ -253,11 +253,11 @@ export default function App() {
         <SafeAreaView style={{ flex: 1 }}>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="Sign-in-up" component={HomeScreen} />
               <Stack.Screen
                 name="DrawerNavigator"
                 component={DrawerNavigator}
               />
+              <Stack.Screen name="Sign-in-up" component={HomeScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaView>
@@ -274,15 +274,15 @@ const styles = StyleSheet.create({
     border: "solid",
     borderWidth: 1,
     borderRadius: 20,
-    padding: 10,
+    paddingHorizontal: 20,
     width: 240,
-    marginBottom : 3,
+    marginBottom : 300,
   },
   btn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: 150,
-    marginVertical: -10,
+    marginVertical: -5,
   },
 });
