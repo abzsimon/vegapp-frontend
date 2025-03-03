@@ -1,5 +1,5 @@
-import "react-native-gesture-handler";
 import "react-native-reanimated";
+import "react-native-gesture-handler";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text, Switch, StyleSheet } from "react-native";
@@ -58,14 +58,42 @@ function CustomDrawerContent(props) {
   const userInfo = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
+  const changeDietDb = (regime, method) => {
+    fetch(`${process.env.EXPO_PUBLIC_API_URL}users/regimes`, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: userInfo.token, 
+        regime: regime, // Replace with the regime you want to add
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result) {
+          console.log('Regime toggled successfully!');
+        } else {
+          setMessage(data.error); // Display error message
+        }
+      })
+      .catch(error => {
+        console.error('Error adding regime:', error);
+        setMessage('An error occurred.');
+      });
+  };
+
   const toggleDiet = (diet) => {
     if (userInfo.regime.includes(diet)) {
+      changeDietDb(diet, "DELETE")
       dispatch(removeDiet(diet)); // supprime si ∃
     } else {
       dispatch(addDiet(diet)); // ajoute si ∄
+      changeDietDb(diet, "POST")
     }
   };
   console.log(userInfo);
+  
   return (
     <DrawerContentScrollView {...props}>
     <DrawerItemList {...props} />
@@ -225,11 +253,11 @@ export default function App() {
         <SafeAreaView style={{ flex: 1 }}>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="Sign-in-up" component={HomeScreen} />
               <Stack.Screen
                 name="DrawerNavigator"
                 component={DrawerNavigator}
               />
-              <Stack.Screen name="Sign-in-up" component={HomeScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaView>

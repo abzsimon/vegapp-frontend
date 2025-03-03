@@ -11,6 +11,8 @@ import { addIngredient, removeIngredient } from "../reducers/user";
 import { FontAwesome } from "@expo/vector-icons";
 
 export default function PlacesScreen() {
+  console.log("blabla",`${process.env.EXPO_PUBLIC_API_URL}commerces/ingredientsCpf`)
+
   const [location, setLocation] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [markers, setMarkers] = useState([]);
@@ -49,7 +51,7 @@ export default function PlacesScreen() {
   const handleInputChange = async (inputValue) => {
     console.log(inputValue);
     const response = await fetch(
-      `http://192.168.1.12:3000/commerces/ingredientsCpf`,
+      `${process.env.EXPO_PUBLIC_API_URL}commerces/ingredientsCpf`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,7 +144,7 @@ export default function PlacesScreen() {
     if (!infoBubble || !userToken) return;
 
     try {
-      const endpoint = "http://192.168.1.12:3000/users/business/bookmark";
+      const endpoint = `${process.env.EXPO_PUBLIC_API_URL}users/business/bookmark`;
       const method = isBookmarked ? "DELETE" : "POST";
 
       const requestBody = isBookmarked
