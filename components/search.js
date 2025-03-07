@@ -76,7 +76,7 @@ export default function SearchScreen() {
 
       // Faire la requête au backend
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}${searchParams}`,
+        `${process.env.EXPO_PUBLIC_API_URL}recipes/search?${searchParams}`,
       );
       const data = await response.json();
 

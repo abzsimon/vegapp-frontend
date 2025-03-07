@@ -107,7 +107,7 @@ export default function AddRecipeScreen() {
       };
 
       const response = await fetch(
-        "http://192.168.1.12:3000/recipes",
+        `${process.env.EXPO_PUBLIC_API_URL}recipes`,
         {
           method: "POST",
           headers: {

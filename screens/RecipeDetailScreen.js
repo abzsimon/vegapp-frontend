@@ -28,7 +28,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
 
   const toggleBookmark = async () => {
     try {
-      const endpoint = "http://192.168.1.12:3000/users/bookmark";
+      const endpoint = `${process.env.EXPO_PUBLIC_API_URL}users/bookmark`;
       const method = isBookmarked ? "DELETE" : "POST";
 
       const response = await fetch(endpoint, {
@@ -61,7 +61,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
   const fetchRecipeDetails = async () => {
     try {
       const response = await fetch(
-        `http://192.168.1.12:3000/recipes/${recipeId}`
+        `${process.env.EXPO_PUBLIC_API_URL}recipes/${recipeId}`
       );
       const data = await response.json();
 
@@ -100,7 +100,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
   const submitRating = async () => {
     try {
       const response = await fetch(
-        `http://192.168.1.12:3000/recipes/${recipeId}/vote`,
+        `${process.env.EXPO_PUBLIC_API_URL}recipes/${recipeId}/vote`,
         {
           method: "POST",
           headers: {

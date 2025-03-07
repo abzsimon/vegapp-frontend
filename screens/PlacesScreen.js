@@ -144,7 +144,7 @@ export default function PlacesScreen() {
     if (!infoBubble || !userToken) return;
 
     try {
-      const endpoint = `${process.env.EXPO_PUBLIC_API_URL}users/business/bookmark`;
+      const endpoint = `${process.env.EXPO_PUBLIC_API_URL}commerces/business/bookmark`;
       const method = isBookmarked ? "DELETE" : "POST";
 
       const requestBody = isBookmarked

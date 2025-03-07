@@ -36,7 +36,7 @@ export default function BookmarksScreen() {
   const fetchBookmarks = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://192.168.1.12:3000/users/bookmarks/${userToken}`);
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}users/bookmarks/${userToken}`);
       const data = await response.json();
 
       if (data.result) {
@@ -55,7 +55,7 @@ export default function BookmarksScreen() {
   // Fonction pour retirer un favori
   const removeBookmark = async (recipeId) => {
     try {
-      const response = await fetch('http://192.168.1.12:3000/users/bookmark', {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}users/bookmark`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
